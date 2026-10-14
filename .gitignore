@@ -1,0 +1,27 @@
+# Credenciales
+.env
+
+# Datos de clientes: nunca se suben
+*.csv
+*.xlsx
+*.xls
+*.bak
+*.zip
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.ps1
+logs/
+input/
+output/
+backup/
+Destino/
+Origen/
+mapping/
+
+# Python y Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
