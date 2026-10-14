@@ -1,14 +1,14 @@
-# Migración de datos de una clínica: de SQL Server a Flowww (MySQL)
+# Migración de datos de una clínica: de Cliniwin (SQL Server) a Flowww (MySQL)
 
-Este repositorio recoge la migración completa de los datos de una clínica de medicina estética desde su antiguo software de gestión (base de datos SQL Server) a Flowww, un ERP en la nube para clínicas que trabaja sobre MySQL. Hice el proyecto entero en mi trabajo en EVOTIC: el análisis del origen, la extracción, la transformación a las plantillas de Flowww, la carga en la base de datos de producción y la migración de los ficheros físicos (documentos y fotos).
+Este repositorio recoge la migración completa de los datos de una clínica de medicina estética desde su antiguo software de gestión, Cliniwin (base de datos SQL Server), a Flowww, un ERP en la nube para clínicas que trabaja sobre MySQL. Hice el proyecto entero en mi trabajo en EVOTIC: el análisis del origen, la extracción, la transformación a las plantillas de Flowww, la carga en la base de datos de producción y la migración de los ficheros físicos (documentos y fotos).
 
 Por privacidad he anonimizado el nombre de la clínica y he quitado todo lo que pudiera identificar a pacientes o servidores. En el repositorio solo hay código: ningún dato real.
 
 ## Contexto
 
-La clínica me entregó una copia de seguridad (`.bak`) de su base de datos y una exportación con todos sus ficheros: consentimientos firmados, informes en PDF y fotos de tratamientos. El objetivo era que el primer día de trabajo con Flowww tuvieran disponible todo su histórico: fichas de clientes, historia clínica, agenda, presupuestos, deudas pendientes, anticipos, estudios antropométricos, documentos y fotos.
+La clínica me entregó una copia de seguridad (`.bak`) de su base de datos de Cliniwin y una exportación con todos sus ficheros: consentimientos firmados, informes en PDF y fotos de tratamientos. El objetivo era que el primer día de trabajo con Flowww tuvieran disponible todo su histórico: fichas de clientes, historia clínica, agenda, presupuestos, deudas pendientes, anticipos, estudios antropométricos, documentos y fotos.
 
-El origen y el destino no se parecen en nada. El software antiguo guarda a todas las personas (clientes, empleados, profesionales) en una misma tabla, calcula las deudas al vuelo con procedimientos almacenados y relaciona los ficheros con los clientes por rutas de carpeta. Flowww espera una tabla por concepto, con sus propios identificadores y catálogos (tarifas, usuarios, cabinas), así que buena parte del trabajo fue entender bien el modelo de origen antes de escribir una sola línea de transformación.
+El origen y el destino no se parecen en nada. Cliniwin guarda a todas las personas (clientes, empleados, profesionales) en una misma tabla, calcula las deudas al vuelo con procedimientos almacenados y relaciona los ficheros con los clientes por rutas de carpeta. Flowww espera una tabla por concepto, con sus propios identificadores y catálogos (tarifas, usuarios, cabinas), así que buena parte del trabajo fue entender bien el modelo de origen antes de escribir una sola línea de transformación.
 
 ## Herramientas
 
@@ -49,7 +49,7 @@ Lo más importante que saqué de este análisis:
 
 - Todas las personas están en la tabla `persona`, identificadas por un GUID (`codpersona`). Flowww necesita un identificador numérico, así que creé una copia de la tabla (`person_dup`) con una columna autonumérica `personaID`. Ese ID es el que uso después en todas las tablas para enlazar cada registro con su cliente.
 - Había muchos registros sin nombre o sin apellido y bastantes duplicados por nombre completo, así que los revisé antes de decidir qué se migraba.
-- Las deudas y los anticipos no existen como tabla: el programa los calcula con los procedimientos almacenados `ObtenerDeudoresAcreedoresAFechaActual` y `ObtenerDeudoresAcreedoresAFinDeAnyo`. Para poder migrarlos ejecuté esos procedimientos y guardé el resultado en dos tablas físicas, `deudores` y `acreedores`.
+- Las deudas y los anticipos no existen como tabla: Cliniwin los calcula con los procedimientos almacenados `ObtenerDeudoresAcreedoresAFechaActual` y `ObtenerDeudoresAcreedoresAFinDeAnyo`. Para poder migrarlos ejecuté esos procedimientos y guardé el resultado en dos tablas físicas, `deudores` y `acreedores`.
 
 ### 2. Preparar el origen en SQL Server
 
